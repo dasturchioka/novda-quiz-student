@@ -8,4 +8,4 @@ const app = createApp(App)
 
 app.use(router)
 app.use(createPinia())
-app.mount('#root')
+app.mount('#app')

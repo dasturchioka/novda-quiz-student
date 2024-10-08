@@ -1,16 +1,16 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import { Teacher } from '@/models'
+import { Student, Teacher } from '@/models'
 import { studentInstance } from '@/http'
 import { toast } from 'vue-sonner'
 import Cookies from 'js-cookie'
 import { useRouter } from 'vue-router'
 
 export const useAuth = defineStore('auth-store', () => {
-	const teacherInfo = ref<Teacher>()
+	const studentInfo = ref<Student>()
 	const router = useRouter()
 
-	async function register(data: Teacher) {
+	async function register(data: { fullname: string; password: string; classroomOneId?: string }) {
 		try {
 			const response = await studentInstance.post('/register', data)
 
@@ -20,9 +20,9 @@ export const useAuth = defineStore('auth-store', () => {
 			}
 
 			Cookies.set('token', response.data.token)
-			Cookies.set('oneId', response.data.teacher.oneId)
+			Cookies.set('oneId', response.data.student.oneId)
 			Cookies.set('beta-component', 'true')
-			teacherInfo.value = response.data.teacher
+			studentInfo.value = response.data.student
 			toast(response.data.msg)
 			await router.push('/')
 			return
@@ -35,7 +35,7 @@ export const useAuth = defineStore('auth-store', () => {
 		}
 	}
 
-	async function login(data: Teacher) {
+	async function login(data: { oneId: string; password: string; classroomOneId?: string }) {
 		try {
 			const response = await studentInstance.post('/login', data)
 
@@ -45,9 +45,9 @@ export const useAuth = defineStore('auth-store', () => {
 			}
 
 			Cookies.set('token', response.data.token)
-			Cookies.set('oneId', response.data.teacher.oneId)
+			Cookies.set('oneId', response.data.student.oneId)
 			Cookies.set('beta-component', 'true')
-			teacherInfo.value = response.data.teacher
+			studentInfo.value = response.data.student
 			toast(response.data.msg)
 			await router.push('/')
 			return
@@ -94,8 +94,8 @@ export const useAuth = defineStore('auth-store', () => {
 
 			if (response.data.status === 'ok') {
 				Cookies.set('token', response.data.token)
-				Cookies.set('oneId', response.data.teacher.oneId)
-				teacherInfo.value = response.data.teacher
+				Cookies.set('oneId', response.data.student.oneId)
+				studentInfo.value = response.data.student
 			}
 		} catch (error: any) {
 			console.log(error)
@@ -108,7 +108,7 @@ export const useAuth = defineStore('auth-store', () => {
 	}
 
 	return {
-		teacherInfo,
+		studentInfo,
 		register,
 		check,
 		login,

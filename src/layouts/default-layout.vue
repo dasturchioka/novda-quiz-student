@@ -1,24 +1,13 @@
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted, computed } from 'vue'
+import { ref, onUnmounted, computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
-import {
-	MenuIcon,
-	XIcon,
-	UsersRound,
-	Boxes,
-	CircleDashed,
-	ListCheck,
-	Globe,
-	X,
-} from 'lucide-vue-next'
+import { MenuIcon, XIcon, ChevronsUp } from 'lucide-vue-next'
 import Cookies from 'js-cookie'
+import { useClassrooms } from '@/modules/classrooms/store'
+import { storeToRefs } from 'pinia'
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
 
 const visibilityBetaComponent = ref(Cookies.get('beta-component'))
-
-const navItems = [
-	{ href: '/classrooms', label: 'Sinfxonalar', icon: Boxes },
-	{ href: '/exams', label: 'Talabalar', icon: UsersRound },
-]
 
 const route = useRoute()
 const sidebarOpen = ref(false)
@@ -43,6 +32,14 @@ const closeBetaComponent = () => {
 	visibilityBetaComponent.value = Cookies.get('beta-component')
 }
 
+const classroomsStore = useClassrooms()
+
+const { navItems } = storeToRefs(classroomsStore)
+
+onMounted(async () => {
+	await classroomsStore.getClassrooms()
+})
+
 onMounted(() => {
 	checkMobile()
 	window.addEventListener('resize', checkMobile)
@@ -66,7 +63,7 @@ onUnmounted(() => {
 				<div class="first-part">
 					<div class="flex h-14 items-center border-b px-4">
 						<h1 class="font-bold tracking-tighter font-manrope text-2xl">
-							Teacher <b class="text-blue-500">.</b>
+							Student <b class="text-blue-500">.</b>
 						</h1>
 						<button
 							v-if="isMobile"
@@ -77,21 +74,70 @@ onUnmounted(() => {
 						</button>
 					</div>
 					<nav class="flex-1 space-y-2 overflow-y-auto p-2 h-auto max-h-[400px]">
-						<RouterLink
-							v-for="item in navItems"
-							:to="item.href"
-							:key="item.href"
-							:href="item.href"
-							:class="[
-								'flex items-center rounded-md px-3 py-2 font-medium transition-colors font-noto',
-								currentPath === item.href
-									? 'bg-neutral-500 text-neutral-50 hover:text-neutral-50 hover:bg-neutral-500'
-									: 'text-neutral-900 dark:hover:bg-neutral-800 hover:bg-neutral-200',
-							]"
-						>
-							<component :is="item.icon" class="mr-2 h-4 w-4" />
-							{{ item.label }}
-						</RouterLink>
+						<li style="list-style: none" v-for="item in navItems">
+							<RouterLink
+								v-if="!item.children"
+								:to="item.href"
+								:key="item.href"
+								:href="item.href"
+								:class="[
+									'flex items-center rounded-md px-3 py-2 font-medium transition-colors font-noto',
+									currentPath === item.href
+										? 'bg-blue-500 text-neutral-50 hover:text-neutral-50 hover:bg-blue-500'
+										: 'text-neutral-900 dark:hover:bg-neutral-800 hover:bg-neutral-200',
+								]"
+							>
+								<component :is="item.icon" class="mr-2 h-4 w-4" />
+								{{ item.label }}
+							</RouterLink>
+							<Collapsible v-else v-model:open="item.isOpen">
+								<CollapsibleTrigger as-child>
+									<button
+										class="flex text-base items-center justify-between px-3 py-2 rounded-md font-medium transition-colors font-noto w-full"
+										:class="{
+											'bg-blue-500 text-neutral-50 hover:text-neutral-50 hover:bg-blue-500':
+												currentPath === item.href,
+											'text-neutral-900 dark:hover:bg-neutral-900 hover:bg-neutral-200':
+												currentPath !== item.href,
+										}"
+									>
+										<span
+											class="flex items-center"
+											:class="{
+												'bg-blue-500 text-neutral-50 hover:text-neutral-50 hover:bg-blue-500':
+													currentPath === item.href,
+												'text-neutral-900 dark:hover:bg-neutral-900 hover:bg-neutral-200':
+													currentPath !== item.href,
+											}"
+										>
+											<component :is="item.icon" class="mr-2 h-4 w-4" />
+											{{ item.label }}
+										</span>
+										<ChevronsUp
+											class="h-4 w-4 transition-all"
+											:class="[!item.isOpen ? 'rotate-180' : '']"
+										/>
+									</button>
+								</CollapsibleTrigger>
+								<CollapsibleContent class="mt-2">
+									<RouterLink
+										v-for="child in item.children"
+										:to="child.href"
+										:key="child.href"
+										:href="child.href"
+										:class="[
+											'flex items-center rounded-md px-3 py-2 font-medium transition-colors font-noto ml-4',
+											currentPath === child.href
+												? 'bg-blue-500 text-neutral-50 hover:text-neutral-50 hover:bg-blue-500'
+												: 'text-neutral-900 dark:hover:bg-neutral-800 hover:bg-neutral-200',
+										]"
+									>
+										<component :is="child.icon" class="mr-2 h-4 w-4" />
+										{{ child.label }}
+									</RouterLink>
+								</CollapsibleContent>
+							</Collapsible>
+						</li>
 					</nav>
 				</div>
 				<div
@@ -100,7 +146,7 @@ onUnmounted(() => {
 				>
 					<h1 class="text-xl flex items-center font-bold font-manrope mb-4">
 						Sayt beta holatda!
-						<button @click="closeBetaComponent"><X class="size-5 ml-2" /></button>
+						<button @click="closeBetaComponent"><XIcon class="size-5 ml-2" /></button>
 					</h1>
 					<p class="text-sm font-noto">
 						Saytga yangi imkoniyat va qulayliklar qo'shiladi va texnik muammolar tez orada hal
@@ -113,7 +159,7 @@ onUnmounted(() => {
 		<!-- Main content -->
 		<div class="flex flex-1 flex-col">
 			<!-- Mobile header with toggle button -->
-			<header v-if="isMobile" class="flex h-14 items-center border-b bg-background px-4">
+			<header v-if="isMobile" class="flex h-14 items-center border-b bg-background px-4 shadow-md">
 				<button
 					@click="toggleSidebar"
 					class="rounded-md p-2 text-muted-foreground hover:bg-accent hover:text-accent-foreground md:hidden"

@@ -4,9 +4,8 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'
 import { EyeIcon, EyeOffIcon } from 'lucide-vue-next'
-import { ref } from 'vue'
-import { useAuth } from '@/stores/auth'
-import { Teacher } from '@/models'
+import { computed, ref } from 'vue'
+import { useAuth } from '@/modules/auth/store'
 
 const authStore = useAuth()
 
@@ -16,11 +15,22 @@ const togglePassword = () => {
 	showPassword.value = !showPassword.value
 }
 
-const teacherDetails = ref<Teacher>({
-	fullname: '',
-	id: '',
+const studentDetails = ref<{
+	firstname: string
+	lastname: string
+	oneId: string
+	password: string
+	classroomOneId: string
+}>({
+	firstname: '',
+	lastname: '',
 	oneId: '',
 	password: '',
+	classroomOneId: '',
+})
+
+const fullname = computed(() => {
+	return `${studentDetails.value.lastname} ${studentDetails.value.firstname}`
 })
 </script>
 
@@ -33,21 +43,46 @@ const teacherDetails = ref<Teacher>({
 					<TabsTrigger value="login">Login</TabsTrigger>
 				</TabsList>
 				<TabsContent value="register">
-					<form @submit.prevent="authStore.register(teacherDetails)" class="space-y-4">
+					<form
+						@submit.prevent="
+							authStore.register({
+								fullname,
+								password: studentDetails.password,
+								classroomOneId: studentDetails.classroomOneId,
+							})
+						"
+						class="space-y-4"
+					>
 						<div class="space-y-2">
-							<Label for="register-fullname">Ism familiya</Label>
-							<Input
-								v-model:modelValue="teacherDetails.fullname"
-								id="register-fullname"
-								placeholder="Faqat lotin harflarida"
-								required
-							/>
+							<Label for="register-fullname">
+								Ism familiya <i class="font-light">faqat lotin harflarida</i>
+								<b class="text-red-500">*</b>
+							</Label>
+							<div class="mini-groups flex items-center space-x-2">
+								<Input
+									autocomplete="username"
+									autocapitalize
+									v-model:modelValue="studentDetails.firstname"
+									id="register-firstname"
+									placeholder="Ism"
+									required
+								/>
+								<Input
+									autocomplete="username"
+									autocapitalize
+									v-model:modelValue="studentDetails.lastname"
+									id="register-lastname"
+									placeholder="Familiya"
+									required
+								/>
+							</div>
 						</div>
 						<div class="space-y-2">
-							<Label for="register-password">Parol</Label>
+							<Label for="register-password">Parol <b class="text-red-500">*</b></Label>
 							<div class="relative">
 								<Input
-									v-model:modelValue="teacherDetails.password"
+									autocomplete="current-password"
+									v-model:modelValue="studentDetails.password"
 									id="register-password"
 									:type="[showPassword ? 'text' : 'password']"
 									placeholder="Kamida 8 ta belgi"
@@ -64,26 +99,40 @@ const teacherDetails = ref<Teacher>({
 								</Button>
 							</div>
 						</div>
+						<div class="space-y-2">
+							<Label for="register-classroomOneId">Sinfxona oneId </Label>
+							<Input
+								v-model:modelValue="studentDetails.classroomOneId"
+								id="register-classroomOneId"
+								placeholder="O'qituvchingizdan sinfxona oneIdsini so'rang"
+							/>
+						</div>
 						<Button type="submit" class="w-full">Ro'yxatdan o'tish</Button>
 					</form>
 				</TabsContent>
 				<TabsContent value="login">
-					<form @submit.prevent="authStore.login(teacherDetails)" class="space-y-4">
+					<form
+						@submit.prevent="
+							authStore.login({ oneId: studentDetails.oneId, password: studentDetails.password })
+						"
+						class="space-y-4"
+					>
 						<div class="space-y-2">
-							<Label for="login-oneid">OneId</Label>
+							<Label for="login-oneid">OneId <b class="text-red-500">*</b></Label>
 							<Input
-								v-model:modelValue="teacherDetails.oneId"
+								v-model:modelValue="studentDetails.oneId"
 								id="login-oneid"
 								placeholder="Tizim sizga bergan oneId"
 								required
 							/>
 						</div>
 						<div class="space-y-2">
-							<Label for="login-password">Parol</Label>
+							<Label for="login-password">Parol <b class="text-red-500">*</b></Label>
 							<div class="relative">
 								<Input
+									autocomplete="current-password"
 									id="login-password"
-									v-model:modelValue="teacherDetails.password"
+									v-model:modelValue="studentDetails.password"
 									:type="[showPassword ? 'text' : 'password']"
 									placeholder="Parolingizni eslang"
 									required

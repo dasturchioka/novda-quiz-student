@@ -33,7 +33,7 @@ const setInterceptors = (instance: AxiosInstance) => {
 
 // Example of usage:
 export const studentInstance = axios.create({
-	baseURL: config.SERVER_API + '/teacher',
+	baseURL: config.SERVER_API + '/student',
 	headers: {
 		Authorization: `Bearer ${Cookies.get("token")}`
 	}

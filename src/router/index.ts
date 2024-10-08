@@ -27,6 +27,7 @@ const routes: Array<RouteRecordRaw> = [
 		path: '/',
 		component: () => import('@/layouts/default-layout.vue'),
 		name: 'default-layout',
+		redirect: '/classrooms',
 		beforeEnter: (to, from, next) => {
 			const token = Cookies.get('token')
 			const oneId = Cookies.get('oneId')
@@ -41,6 +42,11 @@ const routes: Array<RouteRecordRaw> = [
 				path: 'classrooms',
 				name: 'default-classrooms',
 				component: () => import('../pages/classrooms-page.vue'),
+			},
+			{
+				path: 'classrooms/:oneId',
+				name: 'default-classroom',
+				component: () => import('../pages/single-classroom-page.vue'),
 			},
 		],
 	},
