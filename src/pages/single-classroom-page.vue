@@ -104,7 +104,7 @@ const leaveClassroom = async () => {
 						<h3 class="text-xl font-semibold text-gray-800">Imtihonlar</h3>
 						<p class="text-neutral-400 text-sm mb-4">
 							{{
-								classroom.students || classroom.students.length
+								classroom.students && classroom.students.length
 									? `${classroom.students.length} nafar talaba`
 									: ''
 							}}
