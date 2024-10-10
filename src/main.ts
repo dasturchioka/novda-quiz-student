@@ -6,6 +6,7 @@ import { createPinia } from 'pinia'
 
 const app = createApp(App)
 
+// to apply last commits
 app.use(router)
 app.use(createPinia())
 app.mount('#app')
