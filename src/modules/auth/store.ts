@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import { Student, Teacher } from '@/models'
+import { Student } from '@/models'
 import { studentInstance } from '@/http'
 import { toast } from 'vue-sonner'
 import Cookies from 'js-cookie'

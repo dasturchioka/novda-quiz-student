@@ -1,10 +1,9 @@
 <script lang="ts" setup>
-import Button from '@/components/ui/button/Button.vue'
 import Header from '@/components/ui/header/Header.vue'
 import EnterClassroom from '@/modules/classrooms/enter-classroom.vue'
 import SingleClassroom from '@/modules/classrooms/single-classroom.vue'
 import { useClassrooms } from '@/modules/classrooms/store'
-import { Boxes, LogIn } from 'lucide-vue-next'
+import { Boxes } from 'lucide-vue-next'
 import { storeToRefs } from 'pinia'
 
 const classroomsStore = useClassrooms()
