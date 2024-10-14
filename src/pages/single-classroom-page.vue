@@ -95,7 +95,7 @@ const enterExam = async (examOneId: string) => {
 							>
 								Kirish
 							</Button>
-							<Button v-else class="bg-blue-500 hover:bg-blue-500"> Natijalarni olish </Button>
+							<p v-else class="italic text-red-500 font-semibold"> Imtihon tugadi </p>
 						</div>
 					</li>
 				</ul>
