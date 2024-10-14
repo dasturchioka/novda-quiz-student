@@ -94,7 +94,7 @@ export const useAuth = defineStore('auth-store', () => {
 
 			if (response.data.status === 'ok') {
 				Cookies.set('token', response.data.token)
-				Cookies.set('oneId', response.data.student.oneId)
+				Cookies.set('oneId', response.data.oneId)
 				studentInfo.value = response.data.student
 			}
 		} catch (error: any) {

@@ -25,7 +25,7 @@ const { classroom } = toRefs(props)
 			<p class="truncate text-gray-600 dark:text-gray-300 mb-4 flex items-center font-medium">
 				<UsersRound class="size-5 mr-2" /> {{ classroom.studentsCount }} ta o'quvchi
 			</p>
-			<Button @click="router.push(`/classrooms/${classroom.oneId}`)"> Learn More </Button>
+			<Button @click="router.push(`/classrooms/${classroom.oneId}`)"> Kirish </Button>
 		</div>
 	</div>
 </template>

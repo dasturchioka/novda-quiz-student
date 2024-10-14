@@ -7,9 +7,16 @@ import { ClipboardIcon, LogOut, UserIcon } from 'lucide-vue-next'
 import { Button } from '@/components/ui/button'
 import AskBeforeAction from '@/components/app/ask-before-action.vue'
 import Cookies from 'js-cookie'
+import BackButton from '@/components/app/back-button.vue'
+import { useLoading } from '@/globals/loading'
+import Loading from '@/components/app/loading.vue'
+import { useExam } from '@/modules/exam/store'
 
+const examStore = useExam()
+const loadingStore = useLoading()
 const classroomsStore = useClassrooms()
 
+const { loading } = storeToRefs(loadingStore)
 const { classroom } = storeToRefs(classroomsStore)
 
 const route = useRoute()
@@ -24,12 +31,20 @@ const leaveClassroom = async () => {
 	await classroomsStore.leaveClassroom(String(route.params.oneId))
 	await router.push('/classrooms/')
 }
+
+const enterExam = async (examOneId: string) => {
+	console.log(examOneId)
+	const classroomOneId = route.params.oneId as string
+	await examStore.enterExam({ classroomOneId, examOneId })
+}
 </script>
 
 <template>
-	<div v-if="classroom" class="min-h-screen flex">
+	<Loading v-if="loading && !classroom" />
+	<div v-else-if="classroom && !loading" class="min-h-screen flex">
 		<!-- Main content -->
 		<main class="flex flex-col flex-grow py-2 overflow-y-auto">
+			<BackButton />
 			<header
 				class="bg-gradient-to-r from-blue-500 to-indigo-600 rounded-lg p-6 mb-6 text-white shadow"
 			>
@@ -53,11 +68,6 @@ const leaveClassroom = async () => {
 				>
 					<ClipboardIcon class="w-12 h-12 text-gray-400 mx-auto mb-3" />
 					<p class="text-gray-600">Hali imtihonlar mavjud emas</p>
-					<button
-						class="mt-4 px-4 py-2 bg-indigo-500 text-white rounded-md hover:bg-indigo-600 transition duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-					>
-						Schedule New Exam
-					</button>
 				</div>
 				<ul v-else class="space-y-2">
 					<li
@@ -78,7 +88,13 @@ const leaveClassroom = async () => {
 							</div>
 						</div>
 						<div class="mt-4 flex justify-end space-x-2">
-							<Button v-if="exam.active" class="bg-blue-500 hover:bg-blue-500"> Kirish </Button>
+							<Button
+								v-if="exam.active"
+								@click="enterExam(exam.oneId)"
+								class="bg-blue-500 hover:bg-blue-500"
+							>
+								Kirish
+							</Button>
 							<Button v-else class="bg-blue-500 hover:bg-blue-500"> Natijalarni olish </Button>
 						</div>
 					</li>
@@ -101,7 +117,7 @@ const leaveClassroom = async () => {
 				<!-- Students section -->
 				<section class="bg-white rounded-lg shadow p-6 lg:col-span-2 border">
 					<div>
-						<h3 class="text-xl font-semibold text-gray-800">Imtihonlar</h3>
+						<h3 class="text-xl font-semibold text-gray-800">Talabalar</h3>
 						<p class="text-neutral-400 text-sm mb-4">
 							{{
 								classroom.students && classroom.students.length
@@ -110,7 +126,6 @@ const leaveClassroom = async () => {
 							}}
 						</p>
 					</div>
-					<h3 class="text-xl font-semibold text-gray-800 mb-4">Talabalar</h3>
 					<div class="max-h-[300px] overflow-y-auto">
 						<ul class="space-y-2">
 							<li

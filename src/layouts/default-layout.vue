@@ -5,10 +5,12 @@ import { MenuIcon, XIcon, ChevronsUp } from 'lucide-vue-next'
 import Cookies from 'js-cookie'
 import { useClassrooms } from '@/modules/classrooms/store'
 import { storeToRefs } from 'pinia'
+import { useAuth } from '@/modules/auth/store'
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
 
 const visibilityBetaComponent = ref(Cookies.get('beta-component'))
 
+const authStore = useAuth()
 const route = useRoute()
 const sidebarOpen = ref(false)
 const isMobile = ref(false)
@@ -35,6 +37,10 @@ const closeBetaComponent = () => {
 const classroomsStore = useClassrooms()
 
 const { navItems } = storeToRefs(classroomsStore)
+
+onMounted(async () => {
+	await authStore.check()
+})
 
 onMounted(async () => {
 	await classroomsStore.getClassrooms()
@@ -126,7 +132,7 @@ onUnmounted(() => {
 										:key="child.href"
 										:href="child.href"
 										:class="[
-											'flex items-center rounded-md px-3 py-2 font-medium transition-colors font-noto ml-4',
+											'flex items-center rounded-md px-3 py-1 font-medium transition-colors font-noto ml-4',
 											currentPath === child.href
 												? 'bg-blue-500 text-neutral-50 hover:text-neutral-50 hover:bg-blue-500'
 												: 'text-neutral-900 dark:hover:bg-neutral-800 hover:bg-neutral-200',
