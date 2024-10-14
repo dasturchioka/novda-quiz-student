@@ -3,10 +3,12 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'
-import { EyeIcon, EyeOffIcon } from 'lucide-vue-next'
+import { EyeIcon, EyeOffIcon, KeyRound } from 'lucide-vue-next'
 import { computed, ref } from 'vue'
 import { useAuth } from '@/modules/auth/store'
+import { useOneId } from '@/composables/useOneId'
 
+const { generateRandomOneId } = useOneId()
 const authStore = useAuth()
 
 const showPassword = ref(false)
@@ -32,6 +34,12 @@ const studentDetails = ref<{
 const fullname = computed(() => {
 	return `${studentDetails.value.lastname} ${studentDetails.value.firstname}`
 })
+
+const generateOneId = async () => {
+	const { value } = await generateRandomOneId()
+
+	studentDetails.value.oneId = value
+}
 </script>
 
 <template>
@@ -49,6 +57,7 @@ const fullname = computed(() => {
 								fullname,
 								password: studentDetails.password,
 								classroomOneId: studentDetails.classroomOneId,
+								oneId: studentDetails.oneId
 							})
 						"
 						class="space-y-4"
@@ -62,7 +71,7 @@ const fullname = computed(() => {
 								<Input
 									autocomplete="username"
 									autocapitalize
-									v-model:modelValue="studentDetails.firstname"
+									v-model:modelValue.trim="studentDetails.firstname"
 									id="register-firstname"
 									placeholder="Ism"
 									required
@@ -70,11 +79,32 @@ const fullname = computed(() => {
 								<Input
 									autocomplete="username"
 									autocapitalize
-									v-model:modelValue="studentDetails.lastname"
+									v-model:modelValue.trim="studentDetails.lastname"
 									id="register-lastname"
 									placeholder="Familiya"
 									required
 								/>
+							</div>
+						</div>
+							<div class="space-y-2">
+							<Label for="register-oneId">OneId (login) <b class="text-red-500">*</b></Label>
+							<div class="relative">
+								<Input
+									v-model:modelValue="studentDetails.oneId"
+									id="register-oneId"
+									readonly
+									type="text"
+									placeholder="Kalitni bosing"
+									required
+								/>
+								<Button
+									variant="ghost"
+									type="button"
+									class="absolute right-3 top-1/2 -translate-y-1/2"
+									@click="generateOneId"
+								>
+									<KeyRound class="size-5"/>
+								</Button>
 							</div>
 						</div>
 						<div class="space-y-2">
@@ -82,7 +112,7 @@ const fullname = computed(() => {
 							<div class="relative">
 								<Input
 									autocomplete="current-password"
-									v-model:modelValue="studentDetails.password"
+									v-model:modelValue.trim="studentDetails.password"
 									id="register-password"
 									:type="[showPassword ? 'text' : 'password']"
 									placeholder="Kamida 8 ta belgi"
@@ -102,7 +132,7 @@ const fullname = computed(() => {
 						<div class="space-y-2">
 							<Label for="register-classroomOneId">Sinfxona oneId </Label>
 							<Input
-								v-model:modelValue="studentDetails.classroomOneId"
+								v-model:modelValue.trim="studentDetails.classroomOneId"
 								id="register-classroomOneId"
 								placeholder="O'qituvchingizdan sinfxona oneIdsini so'rang"
 							/>

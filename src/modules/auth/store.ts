@@ -10,7 +10,12 @@ export const useAuth = defineStore('auth-store', () => {
 	const studentInfo = ref<Student>()
 	const router = useRouter()
 
-	async function register(data: { fullname: string; password: string; classroomOneId?: string }) {
+	async function register(data: {
+		fullname: string
+		password: string
+		classroomOneId?: string
+		oneId: string
+	}) {
 		try {
 			const response = await studentInstance.post('/register', data)
 
