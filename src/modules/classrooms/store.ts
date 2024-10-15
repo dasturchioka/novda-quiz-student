@@ -86,6 +86,7 @@ export const useClassrooms = defineStore('classrooms-store', () => {
 
 			if (data.status === 'bad') {
 				toast(response.data.msg)
+				await router.push("/")
 				return
 			}
 
