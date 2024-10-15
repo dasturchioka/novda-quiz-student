@@ -11,6 +11,7 @@ import BackButton from '@/components/app/back-button.vue'
 import { useLoading } from '@/globals/loading'
 import Loading from '@/components/app/loading.vue'
 import { useExam } from '@/modules/exam/store'
+import { Exam, Score } from '@/models'
 
 const examStore = useExam()
 const loadingStore = useLoading()
@@ -33,9 +34,24 @@ const leaveClassroom = async () => {
 }
 
 const enterExam = async (examOneId: string) => {
-	console.log(examOneId)
 	const classroomOneId = route.params.oneId as string
 	await examStore.enterExam({ classroomOneId, examOneId })
+}
+
+const notAllowedToExam = (examOneId: string) => {
+	if (!classroom.value) return
+
+	const studentOneId = Cookies.get('oneId')
+
+	const foundExam = classroom.value.exams.find((e: Exam) => e.oneId === examOneId) as Exam
+
+	const foundScore = foundExam.scores.find((s: Score) => s.student.oneId === studentOneId)
+
+	if (foundScore) {
+		return true
+	} else {
+		return false
+	}
 }
 </script>
 
@@ -89,13 +105,24 @@ const enterExam = async (examOneId: string) => {
 						</div>
 						<div class="mt-4 flex justify-end space-x-2">
 							<Button
-								v-if="exam.active"
+								v-if="exam.active && !notAllowedToExam(exam.oneId)"
 								@click="enterExam(exam.oneId)"
 								class="bg-blue-500 hover:bg-blue-500"
 							>
 								Kirish
 							</Button>
-							<p v-else class="italic text-red-500 font-semibold"> Imtihon tugadi </p>
+							<p
+								v-else-if="exam.active && notAllowedToExam(exam.oneId)"
+								class="italic text-red-500 font-semibold"
+							>
+								Siz imtihonni tugatdingiz
+							</p>
+							<p
+								v-else-if="!exam.active || !notAllowedToExam(exam.oneId)"
+								class="italic text-red-500 font-semibold"
+							>
+								Imtihon tugadi
+							</p>
 						</div>
 					</li>
 				</ul>

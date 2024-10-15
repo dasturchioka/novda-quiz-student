@@ -7,6 +7,7 @@ import { EyeIcon, EyeOffIcon, KeyRound } from 'lucide-vue-next'
 import { computed, ref } from 'vue'
 import { useAuth } from '@/modules/auth/store'
 import { useOneId } from '@/composables/useOneId'
+import Logo from "@/assets/logo.svg"
 
 const { generateRandomOneId } = useOneId()
 const authStore = useAuth()
@@ -44,7 +45,8 @@ const generateOneId = async () => {
 
 <template>
 	<div class="register-page h-screen flex flex-col justify-center items-center">
-		<div class="w-full max-w-md mx-auto p-6">
+		<div class="w-full flex flex-col items-center max-w-md mx-auto p-6">
+			<img :src="Logo" class="size-10 sm:mb-6 mb-4">
 			<Tabs defaultValue="register" class="w-full">
 				<TabsList class="grid w-full grid-cols-2">
 					<TabsTrigger value="register">Ro'yxatdan o'tish</TabsTrigger>
