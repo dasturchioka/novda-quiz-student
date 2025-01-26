@@ -4,15 +4,16 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'
 import { EyeIcon, EyeOffIcon, KeyRound } from 'lucide-vue-next'
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useAuth } from '@/modules/auth/store'
 import { useOneId } from '@/composables/useOneId'
-import Logo from "@/assets/logo.svg"
+import Logo from '@/assets/logo.svg'
 
 const { generateRandomOneId } = useOneId()
 const authStore = useAuth()
 
 const showPassword = ref(false)
+const activeTab = ref<'register' | 'login'>('register')
 
 const togglePassword = () => {
 	showPassword.value = !showPassword.value
@@ -41,16 +42,42 @@ const generateOneId = async () => {
 
 	studentDetails.value.oneId = value
 }
+
+const removeOneId = async () => {
+	studentDetails.value.oneId = ''
+}
+
+async function switchTabs(tab: 'register' | 'login') {
+	activeTab.value = tab
+}
+
+watch(
+	() => activeTab.value,
+	async val => {
+		if (val === 'register') {
+			await generateOneId()
+		} else {
+			await removeOneId()
+		}
+
+		console.log(val)
+	},
+	{
+		immediate: true,
+	}
+)
 </script>
 
 <template>
 	<div class="register-page h-screen flex flex-col justify-center items-center">
 		<div class="w-full flex flex-col items-center max-w-md mx-auto p-6">
-			<img :src="Logo" class="size-10 sm:mb-6 mb-4">
-			<Tabs defaultValue="register" class="w-full">
+			<img :src="Logo" class="size-10 sm:mb-6 mb-4" />
+			<Tabs defaultValue="register" class="w-full" :model-value="activeTab">
 				<TabsList class="grid w-full grid-cols-2">
-					<TabsTrigger value="register">Ro'yxatdan o'tish</TabsTrigger>
-					<TabsTrigger value="login">Login</TabsTrigger>
+					<TabsTrigger @click="switchTabs('register')" value="register"
+						>Ro'yxatdan o'tish</TabsTrigger
+					>
+					<TabsTrigger @click="switchTabs('login')" value="login">Login</TabsTrigger>
 				</TabsList>
 				<TabsContent value="register">
 					<form
@@ -59,7 +86,7 @@ const generateOneId = async () => {
 								fullname,
 								password: studentDetails.password,
 								classroomOneId: studentDetails.classroomOneId,
-								oneId: studentDetails.oneId
+								oneId: studentDetails.oneId,
 							})
 						"
 						class="space-y-4"
@@ -88,7 +115,7 @@ const generateOneId = async () => {
 								/>
 							</div>
 						</div>
-							<div class="space-y-2">
+						<div class="space-y-2">
 							<Label for="register-oneId">OneId (login) <b class="text-red-500">*</b></Label>
 							<div class="relative">
 								<Input
@@ -105,7 +132,7 @@ const generateOneId = async () => {
 									class="absolute right-3 top-1/2 -translate-y-1/2"
 									@click="generateOneId"
 								>
-									<KeyRound class="size-5"/>
+									<KeyRound class="size-5" />
 								</Button>
 							</div>
 						</div>
